@@ -56,7 +56,7 @@ public class Square {
      */
     public void showRectangle(Graphics2D g2d) {
         if(active) {
-            color = Color.RED;
+            color = new Color(217, 70, 70, 171);
             g2d.setColor(color);
             setActive(false);
         }

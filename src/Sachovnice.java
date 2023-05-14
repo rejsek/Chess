@@ -236,7 +236,7 @@ public class Sachovnice extends JPanel{
 				int column = (e.getY() -  Math.max(-move,0)) / squareSize;
 
 				if(board[x][y].contains(row, column) && currentPiece != null) {
-					if(currentPiece != null && board[x][y].getColor().equals(Color.RED) ) {
+					if(currentPiece != null && board[x][y].getColor().equals(new Color(217, 70, 70, 171)) ) {
 						pieces[currentPiece.getxPosition()][currentPiece.getyPosition()] = null;
 
 						currentPiece.setxPosition(x);
