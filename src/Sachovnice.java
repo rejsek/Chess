@@ -32,6 +32,8 @@ public class Sachovnice extends JPanel{
 	 */
 	private IPiece currentPiece;
 
+	private Pawn[] enPassantablePawns;
+
 	/**
 	 * Barva pro cerne figurky
 	 */
@@ -41,6 +43,16 @@ public class Sachovnice extends JPanel{
 	 * Barva pro bile figurky
 	 */
 	private Color whitePiece = Color.WHITE;
+
+	/**
+	 * Cerny na tahu
+	 */
+	private boolean blackTurn = false;
+
+	/**
+	 * Bily na tahu
+	 */
+	private boolean whiteTurn = true;
 
 	/**
 	 * Konstruktor
@@ -87,6 +99,8 @@ public class Sachovnice extends JPanel{
 
 			}
 		});
+
+		//JOptionPane.showMessageDialog(null, "Bílý začíná", null, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**
@@ -236,19 +250,78 @@ public class Sachovnice extends JPanel{
 				int column = (e.getY() -  Math.max(-move,0)) / squareSize;
 
 				if(board[x][y].contains(row, column) && currentPiece != null) {
-					if(currentPiece != null && board[x][y].getColor().equals(new Color(217, 70, 70, 171)) ) {
-						pieces[currentPiece.getxPosition()][currentPiece.getyPosition()] = null;
+					if(board[x][y].getColor().equals(new Color(217, 70, 70, 171)) ) {
+						int xPosition = currentPiece.getxPosition();
+						int yPosition = currentPiece.getyPosition();
 
-						currentPiece.setxPosition(x);
-						currentPiece.setyPosition(y);
+						if(xPosition != x || yPosition != y) {
+							if(currentPiece.getColor().equals(blackPiece)) {
+								blackTurn = false;
+								whiteTurn = true;
+							} else {
+								blackTurn = true;
+								whiteTurn = false;
+							}
 
-						pieces[x][y] = currentPiece;
+							pieces[currentPiece.getxPosition()][currentPiece.getyPosition()] = null;
 
-						if(currentPiece instanceof Pawn) {
-							((Pawn) currentPiece).setFirstWalk(false);
+							currentPiece.setxPosition(x);
+							currentPiece.setyPosition(y);
+
+							if(currentPiece instanceof Pawn) {
+								if(currentPiece.getyPosition() == 3 && currentPiece.getColor().equals(blackPiece) && ((Pawn) currentPiece).getFirstWalk()) {
+									((Pawn) currentPiece).setTwoStepsOnFirst(true);
+									enPassantablePawns = ((Pawn) currentPiece).getEnPassantablePawns();
+									((Pawn) currentPiece).enPassant(pieces);
+								} else {
+									((Pawn) currentPiece).setEnPassant(false);
+									((Pawn) currentPiece).setTwoStepsOnFirst(false);
+								}
+
+								if(currentPiece.getyPosition() == 4 && currentPiece.getColor().equals(whitePiece) && ((Pawn) currentPiece).getFirstWalk()) {
+									((Pawn) currentPiece).setTwoStepsOnFirst(true);
+									enPassantablePawns = ((Pawn) currentPiece).getEnPassantablePawns();
+									((Pawn) currentPiece).enPassant(pieces);
+								} else {
+									((Pawn) currentPiece).setEnPassant(false);
+									((Pawn) currentPiece).setTwoStepsOnFirst(false);
+								}
+							} else {
+								for(Pawn i : enPassantablePawns) {
+									if(i != null) {
+										System.out.println(i.getxPosition() + ", " + i.getyPosition());
+										i.setEnPassant(false);
+									}
+								}
+							}
+
+							pieces[x][y] = currentPiece;
+
+							if(currentPiece instanceof Pawn) {
+								removePawnEnPassant(x, y);
+
+								((Pawn) currentPiece).setFirstWalk(false);
+							}
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Metoda provede odebrani pesce, pokud bude mozne brani mimochodem
+	 * @param x		x pozice
+	 * @param y		y pozice
+	 */
+	private void removePawnEnPassant(int x, int y) {
+		if(((Pawn) currentPiece).getEnPassant()) {
+			if(currentPiece.getColor().equals(blackPiece)) {
+				pieces[x][y - 1] = null;
+				((Pawn) currentPiece).setEnPassant(false);
+			} else if(currentPiece.getColor().equals(whitePiece)) {
+				pieces[x][y + 1] = null;
+				((Pawn) currentPiece).setEnPassant(false);
 			}
 		}
 	}
@@ -258,7 +331,13 @@ public class Sachovnice extends JPanel{
 	 */
 	private void validMove() {
 		if(currentPiece != null) {
-			currentPiece.movement(board, pieces);
+			if(blackTurn && currentPiece.getColor().equals(blackPiece)) {
+				currentPiece.movement(board, pieces);
+			}
+
+			if(whiteTurn && currentPiece.getColor().equals(whitePiece)) {
+				currentPiece.movement(board, pieces);
+			}
 		}
 	}
 

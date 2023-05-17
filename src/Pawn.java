@@ -33,6 +33,11 @@ public class Pawn implements IPiece {
 	 */
 	public boolean firstWalk = true;
 
+	public boolean twoStepsOnFirst = false;
+
+	public boolean enPassant = false;
+
+	public Pawn[] enPassantablePawns = new Pawn[2];
 	/**
 	 * Konstuktor
 	 * @param x			x souradnice figurky
@@ -86,10 +91,14 @@ public class Pawn implements IPiece {
 				for (int i = 1; i <= 2; i++) {
 					board[getxPosition()][getyPosition() + (i * direction)].setActive(true);
 				}
+			} else {
+				board[getxPosition()][getyPosition() + direction].setActive(true);
 			}
 
 			showEnemy(pieces, board, direction, enemyColor);
 		} else {
+			showEnPassant(pieces, board);
+
 			if (pieces[getxPosition()][getyPosition() + direction] == null) {
 				board[getxPosition()][getyPosition() + direction].setActive(true);
 			}
@@ -138,6 +147,48 @@ public class Pawn implements IPiece {
 		}
 	}
 
+	public void enPassant(IPiece[][] pieces) {
+		if(twoStepsOnFirst) {
+			if(getxPosition() - 1 >= 0 && getyPosition() >= 0 && getyPosition() < 8) {
+				if (pieces[getxPosition() - 1][getyPosition()] != null) {
+					((Pawn) pieces[getxPosition() - 1][getyPosition()]).setEnPassant(true);
+					enPassantablePawns[0] = ((Pawn) pieces[getxPosition() - 1][getyPosition()]);
+				}
+			}
+
+			if(getxPosition() + 1 < 8 && getyPosition() >= 0 && getyPosition() < 8) {
+				if (pieces[getxPosition() + 1][getyPosition()] != null) {
+					((Pawn) pieces[getxPosition() + 1][getyPosition()]).setEnPassant(true);
+					enPassantablePawns[1] = ((Pawn) pieces[getxPosition() + 1][getyPosition()]);
+				}
+			}
+		}
+	}
+
+	private void showEnPassant(IPiece[][] pieces, Square[][] board) {
+		if(enPassant) {
+			if (getxPosition() + 1 < 8 && getyPosition() + 1 < 8 && getyPosition() - 1 >= 0) {
+				if (pieces[getxPosition() + 1][getyPosition()] != null && !pieces[getxPosition() + 1][getyPosition()].getColor().equals(color)) {
+					if (color.equals(Color.BLACK)) {
+						board[getxPosition() + 1][getyPosition() + 1].setActive(true);
+					} else {
+						board[getxPosition() + 1][getyPosition() - 1].setActive(true);
+					}
+				}
+			}
+
+			if(getxPosition() - 1 >= 0 && getyPosition() + 1 < 8 && getyPosition() - 1 >= 0) {
+				if (pieces[getxPosition() - 1][getyPosition()] != null && !pieces[getxPosition() - 1][getyPosition()].getColor().equals(color)) {
+					if (color.equals(Color.BLACK)) {
+						board[getxPosition() - 1][getyPosition() + 1].setActive(true);
+					} else {
+						board[getxPosition() - 1][getyPosition() - 1].setActive(true);
+					}
+				}
+			}
+		}
+	}
+
 	public void setxPosition(int xPosition) {
 		this.xPosition = xPosition;
 	}
@@ -155,6 +206,14 @@ public class Pawn implements IPiece {
 		this.firstWalk = firstWalk;
 	}
 
+	public void setTwoStepsOnFirst(boolean action) {
+		this.twoStepsOnFirst = action;
+	}
+
+	public void setEnPassant(boolean enPassant) {
+		this.enPassant = enPassant;
+	}
+
 	public int getxPosition() {
 		return this.xPosition;
 	}
@@ -170,5 +229,17 @@ public class Pawn implements IPiece {
 
 	public boolean getFirstWalk() {
 		return this.firstWalk;
+	}
+
+	public boolean isTwoStepsOnFirst() {
+		return this.twoStepsOnFirst;
+	}
+
+	public boolean getEnPassant() {
+		return this.enPassant;
+	}
+
+	public Pawn[] getEnPassantablePawns() {
+		return enPassantablePawns;
 	}
 }
