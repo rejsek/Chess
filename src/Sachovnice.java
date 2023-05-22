@@ -4,7 +4,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Sachovnice extends JPanel{
 	/**
@@ -251,8 +252,10 @@ public class Sachovnice extends JPanel{
 
 				if(board[x][y].contains(row, column) && currentPiece != null) {
 					if(board[x][y].getColor().equals(new Color(217, 70, 70, 171)) ) {
-						int xPosition = currentPiece.getxPosition();
-						int yPosition = currentPiece.getyPosition();
+						int xPosition = (int)currentPiece.getxPosition();
+						int yPosition = (int)currentPiece.getyPosition();
+						int newX = x;
+						int newY = y;
 
 						if(xPosition != x || yPosition != y) {
 							if(currentPiece.getColor().equals(blackPiece)) {
@@ -263,7 +266,7 @@ public class Sachovnice extends JPanel{
 								whiteTurn = false;
 							}
 
-							pieces[currentPiece.getxPosition()][currentPiece.getyPosition()] = null;
+							pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = null;
 
 							currentPiece.setxPosition(x);
 							currentPiece.setyPosition(y);
@@ -289,11 +292,12 @@ public class Sachovnice extends JPanel{
 							} else {
 								for(Pawn i : enPassantablePawns) {
 									if(i != null) {
-										System.out.println(i.getxPosition() + ", " + i.getyPosition());
 										i.setEnPassant(false);
 									}
 								}
 							}
+
+							animation(xPosition, yPosition, newX, newY);
 
 							pieces[x][y] = currentPiece;
 
@@ -302,11 +306,53 @@ public class Sachovnice extends JPanel{
 
 								((Pawn) currentPiece).setFirstWalk(false);
 							}
+
 						}
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Za pomoci teto metody ma kazda figurka animovany tah po sachovnici
+	 * @param xPosition		startovni x pozice figurky
+	 * @param yPosition		startovni y pozice figurky
+	 * @param newX			konecna x pozice figurky
+	 * @param newY			konecna y pozice figurky
+	 */
+	private void animation(int xPosition, int yPosition, int newX, int newY) {
+		IPiece animatedPiece = currentPiece;
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			int moveDistance = 500;
+			int i = 0;
+			@Override
+			public void run() {
+				i++;
+				double t = (double)i / (double) moveDistance;
+				animatedPiece.setxPosition(lerp(xPosition, newX, t));
+				animatedPiece.setyPosition(lerp(yPosition, newY, t));
+
+				if(t >= 1) {
+					cancel();
+				}
+
+				repaint();
+			}
+		}, 0, 1);
+	}
+
+
+	/**
+	 * Spocita novou souradnici na ktere se ma figurka zobrazit
+	 * @param start		startovni pozice
+	 * @param end		konecna pozice
+	 * @param t			koeficien
+	 * @return		nova pozice, na ktere se ma figurka zobrazit
+	 */
+	private double lerp(double start, double end, double t) {
+		return start + t * (end - start);
 	}
 
 	/**
@@ -347,14 +393,14 @@ public class Sachovnice extends JPanel{
 	 */
 	private void isOnEnd(MouseEvent e) {
 		if(currentPiece != null) {
-			Queen queen = new Queen(currentPiece.getxPosition(), currentPiece.getyPosition(), null);
+			Queen queen = new Queen((int)currentPiece.getxPosition(), (int)currentPiece.getyPosition(), null);
 
 			if (currentPiece instanceof Pawn) {
 				if (currentPiece.getyPosition() == 7 || currentPiece.getyPosition() == 0) {
-					pieces[currentPiece.getxPosition()][currentPiece.getyPosition()] = null;
+					pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = null;
 					queen.setColor(currentPiece.getColor());
 
-					pieces[currentPiece.getxPosition()][currentPiece.getyPosition()] = queen;
+					pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = queen;
 				}
 			}
 		}

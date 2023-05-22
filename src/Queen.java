@@ -13,7 +13,7 @@ public class Queen implements IPiece {
      */
     private int[] y = {9, 7, 7, 4, 5, 2, 5, 4, 7, 7, 9, 9};
 
-    public int xPosition, yPosition;
+    public double xPosition, yPosition;
 
     public Color color;
 
@@ -40,13 +40,6 @@ public class Queen implements IPiece {
             queen.lineTo((x[i] * oneUnit) + xPosition, (y[i] * oneUnit) + yPosition);
         }
 
-//        queen.moveTo((3 * oneUnit) + xPosition, (5 * oneUnit) + yPosition);
-//        queen.lineTo((5 * oneUnit) + xPosition, (7 * oneUnit) + yPosition);
-//        queen.lineTo((8 * oneUnit) + xPosition, (4 * oneUnit) + yPosition);
-//
-//        queen.moveTo((3 * oneUnit) + xPosition, (7 * oneUnit) + yPosition);
-//        queen.lineTo((8 * oneUnit) + xPosition, (7 * oneUnit) + yPosition);
-
         g2d.setColor(color);
         g2d.fill(queenCircle1);
         g2d.fill(queenCircle2);
@@ -60,8 +53,8 @@ public class Queen implements IPiece {
         int[] directionsY = {0, 0, 1, -1};
 
         for(int i = 0; i < 4; i ++) {
-            int x = getxPosition();
-            int y = getyPosition();
+            int x = (int)getxPosition();
+            int y = (int)getyPosition();
 
             while(true) {
                 x += directionsX[i];
@@ -92,11 +85,14 @@ public class Queen implements IPiece {
                 while(getxPosition() + forward * x >= 0 && getxPosition() + forward * x <= 7 &&
                         getyPosition() + forward * y >= 0 && getyPosition() + forward * y <= 7) {
 
-                    if(pieces[getxPosition() + forward * x][getyPosition() + forward * y] == null) {
-                        board[getxPosition() + forward * x][getyPosition() + forward * y].setActive(true);
+                    int xForward = (int)getxPosition() + forward * x;
+                    int yForward = (int)getyPosition() + forward * y;
+
+                    if(pieces[xForward][yForward] == null) {
+                        board[xForward][yForward].setActive(true);
                     } else {
-                        if(!pieces[getxPosition() + forward * x][getyPosition() + forward * y].getColor().equals(color)) {
-                            board[getxPosition() + forward * x][getyPosition() + forward * y].setActive(true);
+                        if(!pieces[xForward][yForward].getColor().equals(color)) {
+                            board[xForward][yForward].setActive(true);
                         }
 
                         break;
@@ -109,12 +105,12 @@ public class Queen implements IPiece {
     }
 
     @Override
-    public void setxPosition(int xPosition) {
+    public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
     @Override
-    public void setyPosition(int yPosition) {
+    public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
@@ -124,12 +120,12 @@ public class Queen implements IPiece {
     }
 
     @Override
-    public int getxPosition() {
+    public double getxPosition() {
         return this.xPosition;
     }
 
     @Override
-    public int getyPosition() {
+    public double getyPosition() {
         return this.yPosition;
     }
 

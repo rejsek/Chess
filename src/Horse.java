@@ -13,7 +13,7 @@ public class Horse implements IPiece {
      */
     private int[] y = {9, 7, 7, 6, 3, 4, 3, 1, 1, 3, 6, 7, 7, 9, 9};
 
-    public int xPosition, yPosition;
+    public double xPosition, yPosition;
 
     public Color color;
 
@@ -58,12 +58,12 @@ public class Horse implements IPiece {
                         getyPosition() + forwardY >= 0 && getyPosition() + forwardY < 8) {
 
                     if(getColor().equals(Color.BLACK)) {
-                        if(isThereEnemy(pieces, getxPosition() + forwardX, getyPosition() + forwardY, Color.WHITE)) {
-                            board[getxPosition() + forwardX][getyPosition() + forwardY].setActive(true);
+                        if(isThereEnemy(pieces, (int)getxPosition() + forwardX, (int)getyPosition() + forwardY, Color.WHITE)) {
+                            board[(int)getxPosition() + forwardX][(int)getyPosition() + forwardY].setActive(true);
                         }
                     } else {
-                        if(isThereEnemy(pieces, getxPosition() + forwardX, getyPosition() + forwardY, Color.BLACK)) {
-                            board[getxPosition() + forwardX][getyPosition() + forwardY].setActive(true);
+                        if(isThereEnemy(pieces, (int)getxPosition() + forwardX, (int)getyPosition() + forwardY, Color.BLACK)) {
+                            board[(int)getxPosition() + forwardX][(int)getyPosition() + forwardY].setActive(true);
                         }
                     }
                 }
@@ -72,12 +72,12 @@ public class Horse implements IPiece {
                         getxPosition() + forwardX < 8) {
 
                     if(getColor().equals(Color.BLACK)) {
-                        if(isThereEnemy(pieces, getxPosition() + forwardX, getyPosition() - forwardY, Color.WHITE)) {
-                            board[getxPosition() + forwardX][getyPosition() - forwardY].setActive(true);
+                        if(isThereEnemy(pieces, (int)getxPosition() + forwardX, (int)getyPosition() - forwardY, Color.WHITE)) {
+                            board[(int)getxPosition() + forwardX][(int)getyPosition() - forwardY].setActive(true);
                         }
                     } else {
-                        if(isThereEnemy(pieces, getxPosition() + forwardX, getyPosition() - forwardY, Color.BLACK)) {
-                            board[getxPosition() + forwardX][getyPosition() - forwardY].setActive(true);
+                        if(isThereEnemy(pieces, (int)getxPosition() + forwardX, (int)getyPosition() - forwardY, Color.BLACK)) {
+                            board[(int)getxPosition() + forwardX][(int)getyPosition() - forwardY].setActive(true);
                         }
                     }
                 }
@@ -116,12 +116,12 @@ public class Horse implements IPiece {
     }
 
     @Override
-    public void setxPosition(int xPosition) {
+    public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
     @Override
-    public void setyPosition(int yPosition) {
+    public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
@@ -131,12 +131,12 @@ public class Horse implements IPiece {
     }
 
     @Override
-    public int getxPosition() {
+    public double getxPosition() {
         return this.xPosition;
     }
 
     @Override
-    public int getyPosition() {
+    public double getyPosition() {
         return this.yPosition;
     }
 

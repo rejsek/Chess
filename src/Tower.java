@@ -11,7 +11,7 @@ public class Tower implements IPiece {
      */
     private int[] y = {9, 7, 7, 3, 3, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 3, 3, 7, 7, 9, 9};
 
-    public int xPosition, yPosition;
+    public double xPosition, yPosition;
 
     public Color color;
 
@@ -44,8 +44,8 @@ public class Tower implements IPiece {
         int[] directionsY = {0, 0, 1, -1};
 
         for(int i = 0; i < 4; i ++) {
-            int x = getxPosition();
-            int y = getyPosition();
+            int x = (int)getxPosition();
+            int y = (int)getyPosition();
 
             while(true) {
                 x += directionsX[i];
@@ -69,11 +69,11 @@ public class Tower implements IPiece {
     }
 
 
-    public void setxPosition(int xPosition) {
+    public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
-    public void setyPosition(int yPosition) {
+    public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
@@ -82,11 +82,11 @@ public class Tower implements IPiece {
         this.color = color;
     }
 
-    public int getxPosition() {
+    public double getxPosition() {
         return this.xPosition;
     }
 
-    public int getyPosition() {
+    public double getyPosition() {
         return this.yPosition;
     }
 

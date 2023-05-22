@@ -21,7 +21,7 @@ public class Pawn implements IPiece {
 	/**
 	 * x pozice, y pozice
 	 */
-	public int xPosition, yPosition;
+	public double xPosition, yPosition;
 
 	/**
 	 * Barva
@@ -87,20 +87,20 @@ public class Pawn implements IPiece {
 		Color enemyColor = (color.equals(Color.WHITE)) ? Color.BLACK : Color.WHITE;
 
 		if (firstWalk) {
-			if (pieces[getxPosition()][getyPosition() + direction] == null && pieces[getxPosition()][getyPosition() + (2 * direction)] == null) {
+			if (pieces[(int)getxPosition()][(int)getyPosition() + direction] == null && pieces[(int)getxPosition()][(int)getyPosition() + (2 * direction)] == null) {
 				for (int i = 1; i <= 2; i++) {
-					board[getxPosition()][getyPosition() + (i * direction)].setActive(true);
+					board[(int)getxPosition()][(int)getyPosition() + (i * direction)].setActive(true);
 				}
 			} else {
-				board[getxPosition()][getyPosition() + direction].setActive(true);
+				board[(int)getxPosition()][(int)getyPosition() + direction].setActive(true);
 			}
 
 			showEnemy(pieces, board, direction, enemyColor);
 		} else {
 			showEnPassant(pieces, board);
 
-			if (pieces[getxPosition()][getyPosition() + direction] == null) {
-				board[getxPosition()][getyPosition() + direction].setActive(true);
+			if (pieces[(int)getxPosition()][(int)getyPosition() + direction] == null) {
+				board[(int)getxPosition()][(int)getyPosition() + direction].setActive(true);
 			}
 
 			showEnemy(pieces, board, direction, enemyColor);
@@ -135,14 +135,14 @@ public class Pawn implements IPiece {
 	 */
 	private void showEnemy(IPiece[][] pieces, Square[][] board, int direction, Color enemyColor) {
 		if (getxPosition() + 1 >= 0 && getxPosition() + 1 < 8 && getyPosition() + direction >= 0 && getyPosition() + direction < 8) {
-			if (checkEnemy(pieces, getxPosition() + 1, getyPosition() + direction, enemyColor)) {
-				board[getxPosition() + 1][getyPosition() + direction].setActive(true);
+			if (checkEnemy(pieces, (int)getxPosition() + 1, (int)getyPosition() + direction, enemyColor)) {
+				board[(int)getxPosition() + 1][(int)getyPosition() + direction].setActive(true);
 			}
 		}
 
 		if (getxPosition() - 1 >= 0 && getxPosition() - 1 < 8 && getyPosition() + direction >= 0 && getyPosition() + direction < 8) {
-			if (checkEnemy(pieces, getxPosition() - 1, getyPosition() + direction, enemyColor)) {
-				board[getxPosition() - 1][getyPosition() + direction].setActive(true);
+			if (checkEnemy(pieces, (int)getxPosition() - 1, (int)getyPosition() + direction, enemyColor)) {
+				board[(int)getxPosition() - 1][(int)getyPosition() + direction].setActive(true);
 			}
 		}
 	}
@@ -150,16 +150,16 @@ public class Pawn implements IPiece {
 	public void enPassant(IPiece[][] pieces) {
 		if(twoStepsOnFirst) {
 			if(getxPosition() - 1 >= 0 && getyPosition() >= 0 && getyPosition() < 8) {
-				if (pieces[getxPosition() - 1][getyPosition()] != null) {
-					((Pawn) pieces[getxPosition() - 1][getyPosition()]).setEnPassant(true);
-					enPassantablePawns[0] = ((Pawn) pieces[getxPosition() - 1][getyPosition()]);
+				if (pieces[(int)getxPosition() - 1][(int)getyPosition()] != null) {
+					((Pawn) pieces[(int)getxPosition() - 1][(int)getyPosition()]).setEnPassant(true);
+					enPassantablePawns[0] = ((Pawn) pieces[(int)getxPosition() - 1][(int)getyPosition()]);
 				}
 			}
 
 			if(getxPosition() + 1 < 8 && getyPosition() >= 0 && getyPosition() < 8) {
-				if (pieces[getxPosition() + 1][getyPosition()] != null) {
-					((Pawn) pieces[getxPosition() + 1][getyPosition()]).setEnPassant(true);
-					enPassantablePawns[1] = ((Pawn) pieces[getxPosition() + 1][getyPosition()]);
+				if (pieces[(int)getxPosition() + 1][(int)getyPosition()] != null) {
+					((Pawn) pieces[(int)getxPosition() + 1][(int)getyPosition()]).setEnPassant(true);
+					enPassantablePawns[1] = ((Pawn) pieces[(int)getxPosition() + 1][(int)getyPosition()]);
 				}
 			}
 		}
@@ -168,32 +168,32 @@ public class Pawn implements IPiece {
 	private void showEnPassant(IPiece[][] pieces, Square[][] board) {
 		if(enPassant) {
 			if (getxPosition() + 1 < 8 && getyPosition() + 1 < 8 && getyPosition() - 1 >= 0) {
-				if (pieces[getxPosition() + 1][getyPosition()] != null && !pieces[getxPosition() + 1][getyPosition()].getColor().equals(color)) {
+				if (pieces[(int)getxPosition() + 1][(int)getyPosition()] != null && !pieces[(int)getxPosition() + 1][(int)getyPosition()].getColor().equals(color)) {
 					if (color.equals(Color.BLACK)) {
-						board[getxPosition() + 1][getyPosition() + 1].setActive(true);
+						board[(int)getxPosition() + 1][(int)getyPosition() + 1].setActive(true);
 					} else {
-						board[getxPosition() + 1][getyPosition() - 1].setActive(true);
+						board[(int)getxPosition() + 1][(int)getyPosition() - 1].setActive(true);
 					}
 				}
 			}
 
 			if(getxPosition() - 1 >= 0 && getyPosition() + 1 < 8 && getyPosition() - 1 >= 0) {
-				if (pieces[getxPosition() - 1][getyPosition()] != null && !pieces[getxPosition() - 1][getyPosition()].getColor().equals(color)) {
+				if (pieces[(int)getxPosition() - 1][(int)getyPosition()] != null && !pieces[(int)getxPosition() - 1][(int)getyPosition()].getColor().equals(color)) {
 					if (color.equals(Color.BLACK)) {
-						board[getxPosition() - 1][getyPosition() + 1].setActive(true);
+						board[(int)getxPosition() - 1][(int)getyPosition() + 1].setActive(true);
 					} else {
-						board[getxPosition() - 1][getyPosition() - 1].setActive(true);
+						board[(int)getxPosition() - 1][(int)getyPosition() - 1].setActive(true);
 					}
 				}
 			}
 		}
 	}
 
-	public void setxPosition(int xPosition) {
+	public void setxPosition(double xPosition) {
 		this.xPosition = xPosition;
 	}
 
-	public void setyPosition(int yPosition) {
+	public void setyPosition(double yPosition) {
 		this.yPosition = yPosition;
 	}
 
@@ -214,11 +214,11 @@ public class Pawn implements IPiece {
 		this.enPassant = enPassant;
 	}
 
-	public int getxPosition() {
+	public double getxPosition() {
 		return this.xPosition;
 	}
 
-	public int getyPosition() {
+	public double getyPosition() {
 		return this.yPosition;
 	}
 

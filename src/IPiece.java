@@ -18,13 +18,13 @@ public interface IPiece {
      * Nastavi novou x pozici figurky
      * @param xPosition     nova x pozice figurky
      */
-    void setxPosition(int xPosition);
+    void setxPosition(double xPosition);
 
     /**
      * Nastavi novou y pozici figurky
      * @param yPosition     nova y pozice figurky
      */
-    void setyPosition(int yPosition);
+    void setyPosition(double yPosition);
 
     /**
      * Nastavi novou barvu figurky
@@ -36,13 +36,13 @@ public interface IPiece {
      * Vrati x pozici figurky na sachovnici
      * @return  x pozice figurky
      */
-    int getxPosition();
+    double getxPosition();
 
     /**
      * Vrati y pozici figurky na sachovnici
      * @return  y pozice figurky
      */
-    int getyPosition();
+    double getyPosition();
 
     /**
      * Vrati barvu figurky

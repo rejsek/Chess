@@ -34,7 +34,7 @@ public class King implements IPiece {
      */
     private int[] subtractY = {4, 5, 5, 4, 4, 5, 5, 4};
 
-    public int xPosition, yPosition;
+    public double xPosition, yPosition;
 
     public Color color;
 
@@ -118,49 +118,23 @@ public class King implements IPiece {
                 if(getxPosition() + x >= 0 && getxPosition() + x < 8 &&
                         getyPosition() + y >= 0 && getyPosition() + y < 8) {
 
-                    if (pieces[getxPosition() + x][getyPosition() + y] == null) {
-                        board[getxPosition() + x][getyPosition() + y].setActive(true);
-                    } else if(!pieces[getxPosition() + x][getyPosition() + y].getColor().equals(color)) {
-                        board[getxPosition() + x][getyPosition() + y].setActive(true);
+                    if (pieces[(int)getxPosition() + x][(int)getyPosition() + y] == null) {
+                        board[(int)getxPosition() + x][(int)getyPosition() + y].setActive(true);
+                    } else if(!pieces[(int)getxPosition() + x][(int)getyPosition() + y].getColor().equals(color)) {
+                        board[(int)getxPosition() + x][(int)getyPosition() + y].setActive(true);
                     }
                 }
             }
         }
-
-//        for(int i : direction) {
-//            if(getxPosition() + i >= 0 && getxPosition() + i < 8) {
-//                board[getxPosition() + i][getyPosition()].setActive(true);
-//            }
-//
-//            if(getyPosition() + i >= 0 && getyPosition() + i < 8) {
-//                board[getxPosition()][getyPosition() + i].setActive(true);
-//            }
-//
-//            if(getxPosition() * direction[0] < 8 && getyPosition() + direction[0] < 8) {
-//                board[getxPosition() + direction[0]][getyPosition() + direction[0]].setActive(true);
-//            }
-//
-//            if(getxPosition() + direction[1] >= 0 && getyPosition() + direction[0] < 8) {
-//                board[getxPosition() + direction[1]][getyPosition() + direction[0]].setActive(true);
-//            }
-//
-//            if(getxPosition() + direction[0] < 8 && getyPosition() + direction[1] >= 0) {
-//                board[getxPosition() + direction[0]][getyPosition() + direction[1]].setActive(true);
-//            }
-//
-//            if(getxPosition() + direction[1] >= 0 && getyPosition() + direction[1] >= 0) {
-//                board[getxPosition() + direction[1]][getyPosition() + direction[1]].setActive(true);
-//            }
-//        }
     }
 
     @Override
-    public void setxPosition(int xPosition) {
+    public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
     @Override
-    public void setyPosition(int yPosition) {
+    public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
@@ -170,12 +144,12 @@ public class King implements IPiece {
     }
 
     @Override
-    public int getxPosition() {
+    public double getxPosition() {
         return this.xPosition;
     }
 
     @Override
-    public int getyPosition() {
+    public double getyPosition() {
         return this.yPosition;
     }
 

@@ -13,7 +13,7 @@ public class Bishop implements IPiece {
      */
     private double[] y = {9, 7, 7, 4, 2, 4, 7, 7, 9, 9, 3, 4}; //koncove souradnice pro carku
 
-    public int xPosition, yPosition;
+    public double xPosition, yPosition;
 
     public Color color;
 
@@ -55,11 +55,11 @@ public class Bishop implements IPiece {
                 while(getxPosition() + forward * x >= 0 && getxPosition() + forward * x <= 7 &&
                     getyPosition() + forward * y >= 0 && getyPosition() + forward * y <= 7) {
 
-                    if(pieces[getxPosition() + forward * x][getyPosition() + forward * y] == null) {
-                        board[getxPosition() + forward * x][getyPosition() + forward * y].setActive(true);
+                    if(pieces[(int)getxPosition() + forward * x][(int)getyPosition() + forward * y] == null) {
+                        board[(int)getxPosition() + forward * x][(int)getyPosition() + forward * y].setActive(true);
                     } else {
-                        if(!pieces[getxPosition() + forward * x][getyPosition() + forward * y].getColor().equals(getColor())) {
-                            board[getxPosition() + forward * x][getyPosition() + forward * y].setActive(true);
+                        if(!pieces[(int)getxPosition() + forward * x][(int)getyPosition() + forward * y].getColor().equals(getColor())) {
+                            board[(int)getxPosition() + forward * x][(int)getyPosition() + forward * y].setActive(true);
                         }
 
                         break;
@@ -72,12 +72,12 @@ public class Bishop implements IPiece {
     }
 
     @Override
-    public void setxPosition(int xPosition) {
+    public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
     @Override
-    public void setyPosition(int yPosition) {
+    public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
@@ -87,12 +87,12 @@ public class Bishop implements IPiece {
     }
 
     @Override
-    public int getxPosition() {
+    public double getxPosition() {
         return this.xPosition;
     }
 
     @Override
-    public int getyPosition() {
+    public double getyPosition() {
         return this.yPosition;
     }
 
