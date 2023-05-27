@@ -2,6 +2,12 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 
+/**
+ * Trida slouzi pro vytvoreni figurky Kralovna,
+ * prislusne barvy na pozici x a y
+ *
+ * @author Daniel Riess
+ */
 public class Queen implements IPiece {
     /**
      * x souradnice
@@ -13,16 +19,32 @@ public class Queen implements IPiece {
      */
     private int[] y = {9, 7, 7, 4, 5, 2, 5, 4, 7, 7, 9, 9};
 
-    public double xPosition, yPosition;
+    /**
+     * x a y souradnice figurky
+     */
+    private double xPosition, yPosition;
 
-    public Color color;
+    /**
+     * Barva figurky
+     */
+    private Color color;
 
-    public Queen(int xPosition, int yPosition, Color color) {
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
+    /**
+     * Konstruktor
+     * @param x         x souradnice
+     * @param y         y souradnice
+     * @param color     barva figurky
+     */
+    public Queen(int x, int y, Color color) {
+        this.xPosition = x;
+        this.yPosition = y;
         this.color = color;
     }
 
+    /**
+     * Metoda pro zobrazeni figurky
+     * @param g2d       objekt tridy Graphics2D
+     */
     public void show(Graphics2D g2d) {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         double oneUnit = 0.1;
@@ -47,6 +69,11 @@ public class Queen implements IPiece {
         g2d.fill(queen);
     }
 
+    /**
+     * Zobrazi pristupne tahy podle pravidel
+     * @param board             sachovnice
+     * @param pieces            pole figurek
+     */
     @Override
     public void movement(Square[][] board, IPiece[][] pieces) {
         int[] directionsX = {1, -1, 0, 0};
@@ -104,31 +131,55 @@ public class Queen implements IPiece {
         }
     }
 
+    /**
+     * Nastavi novou x pozici figurky
+     * @param xPosition     nova x pozice figurky
+     */
     @Override
     public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
+    /**
+     * Nastavi novou y pozici figurky
+     * @param yPosition     nova y pozice figurky
+     */
     @Override
     public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
+    /**
+     * Nastavi novou barvu figurky
+     * @param color         nova barva figurky
+     */
     @Override
     public void setColor(Color color) {
         this.color = color;
     }
 
+    /**
+     * Vrati x pozici figurky
+     * @return      x pozice figurky
+     */
     @Override
     public double getxPosition() {
         return this.xPosition;
     }
 
+    /**
+     * Vrati y pozici figurky
+     * @return      y pozice figurky
+     */
     @Override
     public double getyPosition() {
         return this.yPosition;
     }
 
+    /**
+     * Vrati barvu figurky
+     * @return      barva figurky
+     */
     @Override
     public Color getColor() {
         return this.color;

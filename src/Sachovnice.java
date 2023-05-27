@@ -5,8 +5,16 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.Timer;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.TimerTask;
 
+record Pair<A, B>(A first, B second) {}
+/**
+ * Trida zabyvajici se vytvorenim sachovnice a veskere logiky podle pravidel sachu
+ *
+ * @author Daniel Riess
+ */
 public class Sachovnice extends JPanel{
 	/**
 	 * Objekt tridy AffineTransform
@@ -16,12 +24,15 @@ public class Sachovnice extends JPanel{
 	/**
 	 * Pole reprezentujici jednotlive figurky a jejich pozice
 	 */
-	private IPiece[][] pieces = new IPiece[8][8];
+	private IPiece [][] pieces = new IPiece[8][8];
 
 	/**
 	 * Pole reprezentujici jednotlice ctverecky
 	 */
 	private Square[][] board = new Square[8][8];
+
+	private int originalX;
+	private int originalY;
 
 	/**
 	 *
@@ -33,6 +44,9 @@ public class Sachovnice extends JPanel{
 	 */
 	private IPiece currentPiece;
 
+	/**
+	 * Pesci, kteri maji nastaveno, ze lze s nimi enPassant
+	 */
 	private Pawn[] enPassantablePawns;
 
 	/**
@@ -87,7 +101,6 @@ public class Sachovnice extends JPanel{
 				releasedSquare(e);
 				isOnEnd(e);
 				repaint();
-
 			}
 
 			@Override
@@ -100,8 +113,6 @@ public class Sachovnice extends JPanel{
 
 			}
 		});
-
-		//JOptionPane.showMessageDialog(null, "Bílý začíná", null, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	/**
@@ -110,8 +121,9 @@ public class Sachovnice extends JPanel{
 	 */
 	public void paint(Graphics g) {
 		Graphics2D g2d = (Graphics2D)g;
+
 		mensi = Math.min(getWidth(),getHeight());
-		int posun = (getWidth()-getHeight())/2;
+		int posun = (getWidth() - getHeight())/2;
 
 		g2d.translate(Math.max(posun,0),Math.max(-posun,0));
 		g2d.scale(mensi/8.,mensi/8.);
@@ -231,6 +243,8 @@ public class Sachovnice extends JPanel{
 
 				if(board[x][y].contains(row, column) && pieces[x][y] != null) {
 					currentPiece = pieces[x][y];
+					originalX = x;
+					originalY = y;
 
 					board[x][y].setActive(true);
 				}
@@ -258,6 +272,14 @@ public class Sachovnice extends JPanel{
 						int newY = y;
 
 						if(xPosition != x || yPosition != y) {
+							pieces[(int) currentPiece.getxPosition()][(int) currentPiece.getyPosition()] = null;
+
+							currentPiece.setxPosition(x);
+							currentPiece.setyPosition(y);
+
+							IPiece original = pieces[x][y];
+							pieces[x][y] = currentPiece;
+
 							if(currentPiece.getColor().equals(blackPiece)) {
 								blackTurn = false;
 								whiteTurn = true;
@@ -266,50 +288,238 @@ public class Sachovnice extends JPanel{
 								whiteTurn = false;
 							}
 
-							pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = null;
+							isGameOver();
 
-							currentPiece.setxPosition(x);
-							currentPiece.setyPosition(y);
+							if(isChecked(currentPiece.getColor())) {
+								System.out.println("Bacha, kral je v ohrozeni");
 
-							if(currentPiece instanceof Pawn) {
-								if(currentPiece.getyPosition() == 3 && currentPiece.getColor().equals(blackPiece) && ((Pawn) currentPiece).getFirstWalk()) {
-									((Pawn) currentPiece).setTwoStepsOnFirst(true);
-									enPassantablePawns = ((Pawn) currentPiece).getEnPassantablePawns();
-									((Pawn) currentPiece).enPassant(pieces);
+								IPiece movedPiece = currentPiece;
+								pieces[x][y] = null;
+								movedPiece.setxPosition(originalX);
+								movedPiece.setyPosition(originalY);
+
+								pieces[originalX][originalY] = movedPiece;
+								pieces[x][y] = original;
+
+								if(currentPiece.getColor().equals(blackPiece)) {
+									blackTurn = true;
+									whiteTurn = false;
 								} else {
-									((Pawn) currentPiece).setEnPassant(false);
-									((Pawn) currentPiece).setTwoStepsOnFirst(false);
-								}
-
-								if(currentPiece.getyPosition() == 4 && currentPiece.getColor().equals(whitePiece) && ((Pawn) currentPiece).getFirstWalk()) {
-									((Pawn) currentPiece).setTwoStepsOnFirst(true);
-									enPassantablePawns = ((Pawn) currentPiece).getEnPassantablePawns();
-									((Pawn) currentPiece).enPassant(pieces);
-								} else {
-									((Pawn) currentPiece).setEnPassant(false);
-									((Pawn) currentPiece).setTwoStepsOnFirst(false);
+									blackTurn = false;
+									whiteTurn = true;
 								}
 							} else {
-								for(Pawn i : enPassantablePawns) {
-									if(i != null) {
-										i.setEnPassant(false);
-									}
+								enPassant();
+
+								castling();
+
+								animation(xPosition, yPosition, newX, newY);
+
+								if (currentPiece instanceof King) {
+									((King) currentPiece).setFirstStep(false);
+								} else if (currentPiece instanceof Tower) {
+									((Tower) currentPiece).setFirstStep(false);
+								}
+
+								if (currentPiece instanceof Pawn) {
+									removePawnEnPassant(x, y);
+
+									((Pawn) currentPiece).setFirstWalk(false);
 								}
 							}
-
-							animation(xPosition, yPosition, newX, newY);
-
-							pieces[x][y] = currentPiece;
-
-							if(currentPiece instanceof Pawn) {
-								removePawnEnPassant(x, y);
-
-								((Pawn) currentPiece).setFirstWalk(false);
-							}
-
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Metoda zjisti, zda se jedna o konec hry a zahlasi prislusny vysledek
+	 */
+	private void isGameOver() {
+		if(whiteTurn) {
+			if(!isThereAnyMove(blackPiece)) {
+				if(isChecked(blackPiece)) {
+					showResult("Hra skončila matem a vyhrál bílý");
+				} else {
+					showResult("Hra skončila patem a vyhrál bílý");
+				}
+			}
+		} else {
+			if(!isThereAnyMove(whitePiece)) {
+				if(isChecked(whitePiece)) {
+					showResult("Hra skončila matem a vyhrál černý");
+				} else {
+					showResult("Hra skončila patem a vyhrál černý");
+				}
+			}
+		}
+	}
+
+	/**
+	 * Metoda zobrazi vyherni okno s vysledkem hry
+	 * @param message		text, ktery ma byt zobrazen
+	 */
+	private void showResult(String message) {
+		String[] buttons = {"Restartovat hru", "Odejít ze hry"};
+
+		int selectedButton = JOptionPane.showOptionDialog(null, message, "", JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[0]);
+
+		switch(selectedButton) {
+			case 0:
+				restart();
+				break;
+
+			case 1:
+				System.exit(0);
+				break;
+		}
+	}
+
+	/**
+	 * Metoda zjisti, zda se pro danou situaci nachazi nejaky validni tah
+	 * @param color		barva, pro kterou se ma situace vyhodnotit
+	 * @return			true, pokud se vyskytuje nejaky validni tah
+	 * 					false, pokud se nevyskytuje nejaky validni tah
+	 */
+	private boolean isThereAnyMove(Color color) {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (pieces[i][j] != null && pieces[i][j].getColor().equals(color)) {
+					pieces[i][j].movement(board, pieces);
+					List<Pair<Integer, Integer>> availableMoves = new ArrayList<>();
+					for (int x = 0; x < 8; x++) {
+						for (int y = 0; y < 8; y++) {
+							if (board[x][y].getActive()) {
+								availableMoves.add(new Pair<>(x, y));
+							}
+						}
+					}
+
+					for (Pair<Integer, Integer> move : availableMoves) {
+						int x = move.first();
+						int y = move.second();
+						IPiece originalPiece = pieces[x][y];
+						IPiece piece = pieces[i][j];
+
+						// Make the move
+						pieces[x][y] = piece;
+						piece.setxPosition(x);
+						piece.setyPosition(y);
+						pieces[i][j] = null;
+
+						// Check if the move removes the check
+						if (!isChecked(color)) {
+							// The move is valid
+							undoMove(i, j, x, y, originalPiece);
+							return true;
+						}
+
+						// Undo the move
+						undoMove(i, j, x, y, originalPiece);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private void undoMove(int i, int j, int x, int y, IPiece originalPiece) {
+		IPiece piece = pieces[x][y];
+		piece.setxPosition(i);
+		piece.setyPosition(j);
+		pieces[i][j] = piece;
+		pieces[x][y] = originalPiece;
+		if (originalPiece != null) {
+			originalPiece.setxPosition(x);
+			originalPiece.setyPosition(y);
+		}
+		board[x][y].setActive(false);
+	}
+
+	/**
+	 * Metoda zjisti, zda je kral ohrozen
+	 * @return		true, pokud je kral v ohrozeni
+	 * 				false, pokud kral neni v ohrozeni
+	 */
+	private boolean isChecked(Color color) {
+		boolean isChecked = false;
+
+		for(int x = 0; x < 8; x ++) {
+			for(int y = 0; y < 8; y ++) {
+				if(pieces[x][y] != null && !pieces[x][y].getColor().equals(color)) {
+					pieces[x][y].movement(board, pieces);
+				}
+			}
+		}
+		outer:
+		for(int x = 0; x < 8; x ++) {
+			for(int y = 0; y < 8; y ++) {
+				if(pieces[x][y] != null && pieces[x][y] instanceof King && pieces[x][y].getColor().equals(color) && board[x][y].getActive()) {
+					isChecked = true;
+					break outer;
+				}
+			}
+		}
+
+		for(int x = 0; x < 8; x ++) {
+			for(int y = 0; y < 8; y ++) {
+				board[x][y].setActive(false);
+			}
+		}
+
+		return isChecked;
+	}
+
+	/**
+	 * Metoda pro vykonani enPassantu
+	 */
+	private void enPassant() {
+		if(currentPiece instanceof Pawn) {
+			if(currentPiece.getyPosition() == 3 && currentPiece.getColor().equals(blackPiece) && ((Pawn) currentPiece).getFirstWalk()) {
+				((Pawn) currentPiece).setTwoStepsOnFirst(true);
+				enPassantablePawns = ((Pawn) currentPiece).getEnPassantablePawns();
+				((Pawn) currentPiece).enPassant(pieces);
+			}
+
+			if(currentPiece.getyPosition() == 4 && currentPiece.getColor().equals(whitePiece) && ((Pawn) currentPiece).getFirstWalk()) {
+				((Pawn) currentPiece).setTwoStepsOnFirst(true);
+				enPassantablePawns = ((Pawn) currentPiece).getEnPassantablePawns();
+				((Pawn) currentPiece).enPassant(pieces);
+			}
+		} else {
+			for(Pawn i : enPassantablePawns) {
+				if(i != null) {
+					i.setEnPassant(false);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Metoda pro provedeni rosady
+	 */
+	private void castling() {
+		if(currentPiece instanceof King && ((King) currentPiece).getFirstStep() && pieces[7][(int)currentPiece.getyPosition()] instanceof Tower && ((Tower) pieces[7][(int)currentPiece.getyPosition()]).getFirstStep()) {
+			if (pieces[4][(int) currentPiece.getyPosition()] == null && pieces[5][(int) currentPiece.getyPosition()] instanceof King && pieces[6][(int) currentPiece.getyPosition()] == null) {
+				((Tower)pieces[7][(int) currentPiece.getyPosition()]).setFirstStep(false);
+
+				IPiece tower = pieces[7][(int) currentPiece.getyPosition()];
+				tower.setxPosition(4);
+				pieces[7][(int) currentPiece.getyPosition()] = tower;
+			}
+		}
+
+		if(currentPiece instanceof King && ((King) currentPiece).getFirstStep() && pieces[0][(int)currentPiece.getyPosition()] instanceof Tower && ((Tower) pieces[0][(int)currentPiece.getyPosition()]).getFirstStep()) {
+			if (pieces[3][(int) currentPiece.getyPosition()] == null && pieces[2][(int) currentPiece.getyPosition()] == null && pieces[1][(int) currentPiece.getyPosition()] instanceof King) {
+				((Tower)pieces[0][(int) currentPiece.getyPosition()]).setFirstStep(false);
+				pieces[0][(int) currentPiece.getyPosition()].setxPosition(2);
+
+				IPiece tower = pieces[0][(int) currentPiece.getyPosition()];
+				tower.setxPosition(2);
+				pieces[0][(int) currentPiece.getyPosition()] = tower;
 			}
 		}
 	}
@@ -335,6 +545,12 @@ public class Sachovnice extends JPanel{
 				animatedPiece.setyPosition(lerp(yPosition, newY, t));
 
 				if(t >= 1) {
+					for(int x = 0; x < 8; x ++) {
+						for(int y = 0; y < 8; y ++) {
+							board[x][y].setActive(false);
+						}
+					}
+
 					cancel();
 				}
 
@@ -342,7 +558,6 @@ public class Sachovnice extends JPanel{
 			}
 		}, 0, 1);
 	}
-
 
 	/**
 	 * Spocita novou souradnici na ktere se ma figurka zobrazit
@@ -392,17 +607,51 @@ public class Sachovnice extends JPanel{
 	 * @param e
 	 */
 	private void isOnEnd(MouseEvent e) {
-		if(currentPiece != null) {
-			Queen queen = new Queen((int)currentPiece.getxPosition(), (int)currentPiece.getyPosition(), null);
+		if(currentPiece != null & currentPiece instanceof Pawn) {
+			if (currentPiece.getyPosition() == 7 || currentPiece.getyPosition() == 0) {
+				IPiece selectedPiece = null;
+				String[] buttons = {"Kůň", "Střelec", "Věž", "Královna"};
+				int returnPiece = JOptionPane.showOptionDialog(null, "Vyberte si figurku:", "", JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[0]);
 
-			if (currentPiece instanceof Pawn) {
-				if (currentPiece.getyPosition() == 7 || currentPiece.getyPosition() == 0) {
-					pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = null;
-					queen.setColor(currentPiece.getColor());
+				switch(returnPiece) {
+					case 0:
+						selectedPiece = new Horse((int)currentPiece.getxPosition(), (int)currentPiece.getyPosition(), null);
+						break;
 
-					pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = queen;
+					case 1:
+						selectedPiece = new Bishop((int)currentPiece.getxPosition(), (int)currentPiece.getyPosition(), null);
+						break;
+
+					case 2:
+						selectedPiece = new Tower((int)currentPiece.getxPosition(), (int)currentPiece.getyPosition(), null);
+						break;
+
+					case 3:
+						selectedPiece = new Queen((int)currentPiece.getxPosition(), (int)currentPiece.getyPosition(), null);
+						break;
 				}
+
+				pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = null;
+				selectedPiece.setColor(currentPiece.getColor());
+
+				pieces[(int)currentPiece.getxPosition()][(int)currentPiece.getyPosition()] = selectedPiece;
 			}
 		}
+	}
+
+	/**
+	 * Metoda pro vyresetovani hry
+	 */
+	private void restart() {
+		for(int x = 0; x < 8; x ++) {
+			for(int y = 0; y < 8; y ++) {
+				pieces[x][y] = null;
+			}
+		}
+
+		whiteTurn = true;
+		blackTurn = false;
+
+		setPieces();
 	}
 }

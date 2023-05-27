@@ -3,6 +3,12 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 
+/**
+ * Trida slouzi pro vytvoreni figurky Kral
+ * prislusne barvy na pozici x a y
+ *
+ * @author Daniel Riess
+ */
 public class King implements IPiece {
     /**
      * x souradnice
@@ -34,16 +40,37 @@ public class King implements IPiece {
      */
     private int[] subtractY = {4, 5, 5, 4, 4, 5, 5, 4};
 
-    public double xPosition, yPosition;
+    /**
+     * x a y souradnice figurky
+     */
+    private double xPosition, yPosition;
 
-    public Color color;
+    /**
+     * Barva figurky
+     */
+    private Color color;
 
-    public King(int xPosition, int yPosition, Color color) {
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
+    /**
+     * Prvni krok
+     */
+    private boolean firstStep = true;
+
+    /**
+     * Konstruktor
+     * @param x         x souradnice
+     * @param y         y souradnice
+     * @param color     barva figurky
+     */
+    public King(int x, int y, Color color) {
+        this.xPosition = x;
+        this.yPosition = y;
         this.color = color;
     }
 
+    /**
+     * Metoda pro zobrazeni figurky
+     * @param g2d       objekt tridy Graphics2D
+     */
     @Override
     public void show(Graphics2D g2d) {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -109,6 +136,11 @@ public class King implements IPiece {
         g2d.fill(finalKing);
     }
 
+    /**
+     * Zobrazi pristupne tahy podle pravidel
+     * @param board             sachovnice
+     * @param pieces            pole figurek
+     */
     @Override
     public void movement(Square[][] board, IPiece[][] pieces) {
         int[] direction = {-1, 0, 1};
@@ -123,38 +155,93 @@ public class King implements IPiece {
                     } else if(!pieces[(int)getxPosition() + x][(int)getyPosition() + y].getColor().equals(color)) {
                         board[(int)getxPosition() + x][(int)getyPosition() + y].setActive(true);
                     }
+
+
+                    //----------          Rosada - vpravo         ----------//
+                    if(firstStep && pieces[7][(int)getyPosition()] instanceof Tower && ((Tower) pieces[7][(int)getyPosition()]).getFirstStep()) {
+                        if (pieces[4][(int) getyPosition()] == null && pieces[5][(int) getyPosition()] == null && pieces[6][(int) getyPosition()] == null) {
+                            board[(int) getxPosition() + 2][(int) getyPosition()].setActive(true);
+                        }
+                    }
+
+                    //----------          Rosada - vlevo         ----------//
+                    if(firstStep && pieces[0][(int)getyPosition()] instanceof Tower && ((Tower) pieces[0][(int)getyPosition()]).getFirstStep()) {
+                        if (pieces[2][(int) getyPosition()] == null && pieces[1][(int) getyPosition()] == null) {
+                            board[(int) getxPosition() - 2][(int) getyPosition()].setActive(true);
+                        }
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Nastavi novou x pozici figurky
+     * @param xPosition     nova x pozice figurky
+     */
     @Override
     public void setxPosition(double xPosition) {
         this.xPosition = xPosition;
     }
 
+    /**
+     * Nastavi novou y pozici figuky
+     * @param yPosition     nova y pozice figurky
+     */
     @Override
     public void setyPosition(double yPosition) {
         this.yPosition = yPosition;
     }
 
+    /**
+     * Nastavi novou barvu figurky
+     * @param color         nova barva figurky
+     */
     @Override
     public void setColor(Color color) {
         this.color = color;
     }
 
+    /**
+     * Nastavi prvni krok
+     * @param action        novy prvni krok
+     */
+    public void setFirstStep(boolean action) {
+        this.firstStep = action;
+    }
+
+    /**
+     * Vrati x pozici figurky
+     * @return      x pozice figurky
+     */
     @Override
     public double getxPosition() {
         return this.xPosition;
     }
 
+    /**
+     * Vrati y pozici figurky
+     * @return      y pozice figurky
+     */
     @Override
     public double getyPosition() {
         return this.yPosition;
     }
 
+    /**
+     * Vrati barvu figurky
+     * @return      barva figurky
+     */
     @Override
     public Color getColor() {
         return this.color;
+    }
+
+    /**
+     * Vrati, zda figurka udelala prvni krok
+     * @return      prvni krok
+     */
+    public boolean getFirstStep() {
+        return this.firstStep;
     }
 }

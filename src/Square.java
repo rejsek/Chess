@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Trida slouzi k vytvoreni ctverce, predstavujici policko na sachovnici
+ */
 public class Square {
 
     /**
@@ -26,6 +29,8 @@ public class Square {
      * Jaky ctverec je aktivni
      */
     private boolean active = false;
+
+    private boolean movable = false;
 
     private Color color;
 
@@ -101,6 +106,10 @@ public class Square {
         this.color = color;
     }
 
+    public void setMovable(boolean action) {
+        this.movable = action;
+    }
+
     /**
      * Vrati x souradnici ctverecku sachovnice
      * @return  x souradnice
@@ -123,6 +132,10 @@ public class Square {
 
     public Color getColor() {
         return this.color;
+    }
+
+    public boolean isMovable() {
+        return this.movable;
     }
 
     /**
