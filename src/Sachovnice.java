@@ -279,6 +279,8 @@ public class Sachovnice extends JPanel{
 
 							IPiece original = pieces[x][y];
 							pieces[x][y] = currentPiece;
+							
+							isGameOver();
 
 							if(currentPiece.getColor().equals(blackPiece)) {
 								blackTurn = false;
@@ -287,8 +289,6 @@ public class Sachovnice extends JPanel{
 								blackTurn = true;
 								whiteTurn = false;
 							}
-
-							isGameOver();
 
 							if(isChecked(currentPiece.getColor())) {
 								System.out.println("Bacha, kral je v ohrozeni");
